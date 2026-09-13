@@ -1,3 +1,4 @@
+import { homeDir } from "../fs";
 import { nativeModelId } from "../models";
 import type { RuntimeMode } from "../session";
 import { loadClaudeHooks } from "../settings";
@@ -9,6 +10,7 @@ import {
   watchChild,
   writeChild,
 } from "./child";
+import { resolveClaudeProfileEnv } from "./claudeProfiles";
 import {
   askUserQuestionAllowInput,
   asRecord,
@@ -419,11 +421,20 @@ async function ensureLive(input: HarnessSessionInput): Promise<Live> {
     },
   );
 
+  const home = await homeDir(input.cwd);
+  const { env, warning } = resolveClaudeProfileEnv(
+    input.modelSettings?.profile,
+    input.cwd,
+    home,
+  );
+  if (warning) live.onEvent({ type: "status", text: warning });
+
   await spawnChild(
     input.sessionId,
     path,
     buildClaudeSpawnArgs(launch),
     input.cwd,
+    env,
   );
 
   liveByThread.set(input.sessionId, live);
@@ -1354,6 +1365,7 @@ function settingsKeyFor(input: HarnessSessionInput): string {
     fast: input.modelSettings?.fast,
     thinking: input.modelSettings?.thinking,
     context: input.modelSettings?.context,
+    profile: input.modelSettings?.profile,
     runtimeMode: input.runtimeMode,
     hooks: loadClaudeHooks(),
   });
