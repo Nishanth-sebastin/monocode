@@ -36,7 +36,7 @@ async function resolveClaudeConfigDir(
   session: UsageFooterSession | undefined,
 ): Promise<string | undefined> {
   if (!session?.cwd) return undefined;
-  const home = await homeDir(session.cwd);
+  const home = await homeDir();
   const { env } = resolveClaudeProfileEnv(session.profile, session.cwd, home);
   return env.CLAUDE_CONFIG_DIR;
 }

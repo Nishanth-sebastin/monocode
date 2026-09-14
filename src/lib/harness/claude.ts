@@ -360,7 +360,7 @@ async function ensureLive(input: HarnessSessionInput): Promise<Live> {
     await stopClaudeSession(input.sessionId);
   }
 
-  const home = await homeDir(input.cwd);
+  const home = await homeDir();
   const { env, profileId, warning } = resolveClaudeProfileEnv(
     input.modelSettings?.profile,
     input.cwd,
